@@ -35,7 +35,7 @@ class StreamWriter(stream: Stream, targetAccount: Option[TargetAccount], produce
     * @param content the record to push
     */
   def write(content: Content): Unit = {
-    val record = new Record().withData(ByteBuffer.wrap(content.row.getBytes("UTF-8")))
+    val record = new Record().withData(ByteBuffer.wrap((content.row + "\n").getBytes("UTF-8")))
     val putRecordRequest = new PutRecordRequest()
       .withDeliveryStreamName(stream.name)
       .withRecord(record)
