@@ -6,6 +6,7 @@ import awscala.{Region => AWSScalaRegion}
 import awscala.dynamodbv2.DynamoDB
 import com.amazonaws.regions.{Region, Regions}
 import com.amazonaws.services.kinesis.AmazonKinesisClient
+import com.amazonaws.services.kinesisfirehose.AmazonKinesisFirehoseClient
 import com.amazonaws.services.lambda.runtime.{Context => LambdaContext}
 import com.amazonaws.services.lambda.runtime.events.KinesisEvent
 import com.amazonaws.services.lambda.runtime.events.KinesisEvent.KinesisEventRecord
@@ -23,7 +24,7 @@ class Main {
   val kinesisTee:Tee = KinesisTee
   val lambdaUtils:AwsLambdaUtils = LambdaUtils
   val configurationBuilder:Builder = ConfigurationBuilder
-  val getKinesisConnector: (Region, Option[TargetAccount]) => AmazonKinesisClient = StreamWriter.buildClient
+  val getKinesisConnector: (Region, Option[TargetAccount]) => AmazonKinesisFirehoseClient = StreamWriter.buildClient
   val ddb: (AWSScalaRegion) => DynamoDB = DynamoDB.at
 
   /**
