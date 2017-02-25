@@ -34,7 +34,7 @@ import scala.collection.JavaConversions._
 import scala.language.reflectiveCalls
 import java.nio.charset.StandardCharsets
 
-import com.amazonaws.services.kinesis.AmazonKinesisClient
+import com.amazonaws.services.kinesisfirehose.AmazonKinesisFirehoseClient
 
 class MainSpec extends Specification with Mockito {
 
@@ -60,7 +60,7 @@ class MainSpec extends Specification with Mockito {
       builder
     }
 
-    override val getKinesisConnector = (_:Region, _:Option[TargetAccount]) => mock[AmazonKinesisClient]
+    override val getKinesisConnector = (_:Region, _:Option[TargetAccount]) => mock[AmazonKinesisFirehoseClient]
 
     override val ddb = (_:Region) => mock[DynamoDB]
   }
@@ -186,7 +186,7 @@ class MainSpec extends Specification with Mockito {
       main.kinesisEventHandler(sampleKinesisEvent, sampleContext)
       val expectedRouter = new PointToPointRoute(new StreamWriter(Stream(sampleConfig.targetStream.name, Region.getRegion(Regions.US_EAST_1)),
                                                                   sampleConfig.targetStream.targetAccount,
-                                                                  mock[AmazonKinesisClient]))
+                                                                  mock[AmazonKinesisFirehoseClient]))
 
       val lastRoutingStrategy:PointToPointRoute = main.kinesisTee.lastRoutingStrategy.get
       lastRoutingStrategy.toString mustEqual expectedRouter.toString

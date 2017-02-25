@@ -17,7 +17,8 @@ import java.nio.ByteBuffer
 
 import com.amazonaws.auth.{AWSCredentials, AWSCredentialsProvider, BasicAWSCredentials, DefaultAWSCredentialsProviderChain}
 import com.amazonaws.regions.{Region, Regions}
-import com.amazonaws.services.kinesis.AmazonKinesisClient
+import com.amazonaws.services.kinesisfirehose.AmazonKinesisFirehoseClient
+import com.amazonaws.services.kinesisfirehose.model.{ PutRecordRequest, Record }
 import com.snowplowanalytics.kinesistee.config.TargetAccount
 import com.snowplowanalytics.kinesistee.models.{Content, Stream}
 
@@ -27,14 +28,19 @@ import com.snowplowanalytics.kinesistee.models.{Content, Stream}
   * @param targetAccount the target account details, if not using Lambda IAM perms
   * @param producer the kinesis client to use
   */
-class StreamWriter(stream: Stream, targetAccount: Option[TargetAccount], producer: AmazonKinesisClient) {
+class StreamWriter(stream: Stream, targetAccount: Option[TargetAccount], producer: AmazonKinesisFirehoseClient) {
 
   /**
     * push the given record to the requested stream
     * @param content the record to push
     */
   def write(content: Content): Unit = {
-    producer.putRecord(stream.name, ByteBuffer.wrap(content.row.getBytes("UTF-8")), content.partitionKey)
+    val record = new Record().withData(ByteBuffer.wrap((content.row + "\n").getBytes("UTF-8")))
+    val putRecordRequest = new PutRecordRequest()
+      .withDeliveryStreamName(stream.name)
+      .withRecord(record)
+
+    producer.putRecord(putRecordRequest)
   }
 
   def flush: Unit = {
@@ -81,7 +87,7 @@ object StreamWriter {
       new DefaultAWSCredentialsProviderChain()
     }
 
-    val client = new AmazonKinesisClient(credentialsProvider)
+    val client = new AmazonKinesisFirehoseClient(credentialsProvider)
 
     client.setRegion(region)
 

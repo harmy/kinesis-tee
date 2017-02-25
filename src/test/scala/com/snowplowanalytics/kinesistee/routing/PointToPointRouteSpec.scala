@@ -13,7 +13,7 @@
 package com.snowplowanalytics.kinesistee.routing
 
 import com.amazonaws.regions.{Region, Regions}
-import com.amazonaws.services.kinesis.AmazonKinesisClient
+import com.amazonaws.services.kinesisfirehose.AmazonKinesisFirehoseClient
 import com.snowplowanalytics.kinesistee.StreamWriter
 import org.specs2.mutable.Specification
 import com.snowplowanalytics.kinesistee.models.Stream
@@ -40,7 +40,7 @@ class PointToPointRouteSpec extends Specification with ValidationMatchers with M
   "rendering as a string" should {
 
     "display the destination" in {
-      val dest = new StreamWriter(Stream("destination", Region.getRegion(Regions.US_EAST_1)), None, mock[AmazonKinesisClient])
+      val dest = new StreamWriter(Stream("destination", Region.getRegion(Regions.US_EAST_1)), None, mock[AmazonKinesisFirehoseClient])
       val sample = new PointToPointRoute(dest)
       sample.toString mustEqual s"Stream to stream route: stream `source` -> stream ${dest.toString}"
     }
